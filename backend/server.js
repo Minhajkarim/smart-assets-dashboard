@@ -10,6 +10,8 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const { PythonShell } = require("python-shell");
+const { hostname } = require("os");
+const Video = require("./models/Video");
 
 let clients = {};
 
@@ -61,6 +63,12 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
+
+
+// Health Check Endpoint
+app.get("/api/health", (req, res) => {
+  res.json({ message: "Server is running" });
+});
 
 // 🟢 SIGN UP (Register)
 app.post("/api/signup", async (req, res) => {
@@ -392,4 +400,4 @@ io.on("connection", (socket) => {
   });
 });
 // Start Server
-server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+server.listen(PORT, '0.0.0.0',() => console.log(`🚀 Server running on port ${PORT}`));

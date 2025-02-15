@@ -9,8 +9,8 @@ const UserDashboard = () => {
     <DashboardLayout role="user">
       <DashboardNavbar />
       <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 text-center">
-          User Dashboard
-        </h1>
+        User Dashboard
+      </h1>
 
       {/* Live Recording Section */}
       <div className="mb-6">
@@ -23,7 +23,6 @@ const UserDashboard = () => {
         <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
         <RecentReports />
       </div>
-
     </DashboardLayout>
   );
 };

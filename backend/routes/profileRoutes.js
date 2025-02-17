@@ -5,7 +5,7 @@ const User = require("../models/User");
 const router = express.Router();
 
 // ✅ Get Profile (Only Authenticated Users)
-router.get("/profile", authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
     if (!user) return res.status(404).json({ error: "User not found" });
@@ -17,7 +17,7 @@ router.get("/profile", authMiddleware, async (req, res) => {
 });
 
 // ✅ Update Profile (Only the logged-in user)
-router.put("/profile", authMiddleware, async (req, res) => {
+router.put("/", authMiddleware, async (req, res) => {
   try {
     const { name, email } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
@@ -33,8 +33,13 @@ router.put("/profile", authMiddleware, async (req, res) => {
 });
 
 // ✅ Admin-only Route Example
-router.get("/admin", authMiddleware, authorize("admin", "superadmin"), (req, res) => {
-  res.json({ message: "Welcome, Admin!" });
-});
+router.get(
+  "/admin",
+  authMiddleware,
+  authorize("admin", "superadmin"),
+  (req, res) => {
+    res.json({ message: "Welcome, Admin!" });
+  }
+);
 
 module.exports = router;

@@ -6,12 +6,12 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret"; // Change in pro
 // ✅ Middleware to Verify JWT Token & Set `req.user`
 const authMiddleware = async (req, res, next) => {
   const token = req.header("Authorization");
-  if (!token) return res.status(401).json({ error: "Access denied. No token provided." });
+  if (!token)
+    return res.status(401).json({ error: "Access denied. No token provided." });
 
   try {
     const decoded = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
-    const user = await User.findById(decoded.id).select("-password"); // Fetch user from DB
-
+    const user = await User.findById(decoded.userId).select("-password"); // Fetch user from DB
     if (!user) return res.status(404).json({ error: "User not found" });
 
     req.user = user; // Attach full user object to `req.user`

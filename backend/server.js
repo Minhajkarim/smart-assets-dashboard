@@ -12,6 +12,7 @@ const path = require("path");
 const { PythonShell } = require("python-shell");
 const { hostname } = require("os");
 const Video = require("./models/Video");
+const User = require("./models/User");
 
 let clients = {};
 
@@ -46,6 +47,12 @@ app.use(
 );
 app.use("/videos", express.static(path.resolve(__dirname, "videos"))); // Expose videos folder
 
+// routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/user/profile", require("./routes/profileRoutes"));
+app.use("/api/admin/profile", require("./routes/profileRoutes"));
+app.use("/api/superadmin/profile", require("./routes/profileRoutes"));
+
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -55,71 +62,9 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// User Schema & Model
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-});
-
-const User = mongoose.model("User", userSchema);
-
-
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
   res.json({ message: "Server is running" });
-});
-
-// 🟢 SIGN UP (Register)
-app.post("/api/signup", async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser)
-      return res.status(400).json({ message: "User already exists" });
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create and save user
-    const newUser = new User({ name, email, password: hashedPassword });
-    await newUser.save();
-
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" });
-  }
-});
-
-// 🟢 SIGN IN (Login)
-app.post("/api/signin", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user)
-      return res.status(400).json({ message: "Invalid email or password" });
-
-    // Validate password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid email or password" });
-
-    // Generate JWT Token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    res.json({
-      token,
-      user: { id: user._id, name: user.name, email: user.email },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" });
-  }
 });
 
 // Protected Route Example
@@ -140,6 +85,67 @@ function authenticateToken(req, res, next) {
     res.status(403).json({ message: "Invalid Token" });
   }
 }
+
+app.get("/api/videos/:id/report", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const video = await Video.findById(id);
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    // Generate Excel report using ExcelJS
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Video Report");
+
+    // Add header row
+    worksheet.columns = [
+      { header: "Field", key: "field", width: 30 },
+      { header: "Value", key: "value", width: 50 },
+    ];
+
+    // Add video details
+    worksheet.addRow({ field: "Filename", value: video.filename });
+    worksheet.addRow({ field: "Processed Path", value: video.processedPath });
+    worksheet.addRow({ field: "Processed At", value: video.processedAt });
+
+    // add detected objects as a new sheet
+    const detectedObjectsSheet = workbook.addWorksheet("Detected Objects");
+    detectedObjectsSheet.columns = [
+      { header: "Label", key: "label", width: 20 },
+      { header: "X", key: "x", width: 10 },
+      { header: "Y", key: "y", width: 10 },
+      { header: "Width", key: "width", width: 10 },
+      { header: "Height", key: "height", width: 10 },
+    ];
+
+    video.detectedObjects.forEach((object) => {
+      detectedObjectsSheet.addRow({
+        label: object.label,
+        x: object.x,
+        y: object.y,
+        width: object.width,
+        height: object.height,
+      });
+    });
+
+    // Send Excel file as response
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=report-${id}.xlsx`
+    );
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Error generating report:", error);
+    res.status(500).json({ error: "Failed to generate report." });
+  }
+});
 
 // Socket.IO Connection Handler
 io.on("connection", (socket) => {
@@ -255,6 +261,8 @@ io.on("connection", (socket) => {
 
   socket.on("stopRecording", (data) => {
     // get the client id and video id from the data
+
+    console.log("server.stopRecording.data", data);
 
     if (data.videoId && data.clientId) {
       // check if client exists in clients object
@@ -385,6 +393,7 @@ io.on("connection", (socket) => {
                 processedAt: new Date(),
                 detectedObjects: detectedObjects,
                 processedPath: publicProcessedPath,
+                uploadUserId: data.userId,
               });
               video.save();
             }
@@ -400,4 +409,6 @@ io.on("connection", (socket) => {
   });
 });
 // Start Server
-server.listen(PORT, '0.0.0.0',() => console.log(`🚀 Server running on port ${PORT}`));
+server.listen(PORT, "0.0.0.0", () =>
+  console.log(`🚀 Server running on port ${PORT}`)
+);

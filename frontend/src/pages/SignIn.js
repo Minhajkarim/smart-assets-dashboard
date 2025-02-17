@@ -7,6 +7,8 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const navigate = useNavigate(); // Redirect after login
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -14,7 +16,7 @@ const SignIn = () => {
     setMessage(null);
   
     try {
-      const response = await fetch("http://localhost:5000/api/signin", {
+      const response = await fetch(`${backendUrl}/api/auth/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

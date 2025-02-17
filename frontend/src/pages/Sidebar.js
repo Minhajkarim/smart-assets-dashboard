@@ -33,8 +33,8 @@ const Sidebar = ({ role, isOpen, toggleSidebar }) => {
         {/* User Sidebar Links */}
         {role === "user" && (
           <>
-            <SidebarLink to="/resurveys" icon={<FaFileAlt />} text="View Resurveys" isOpen={isOpen} />
-            <SidebarLink to="/submitted-videos" icon={<FaFileAlt />} text="Submitted Videos" isOpen={isOpen} />
+            <SidebarLink to="/user/resurveys" icon={<FaFileAlt />} text="View Resurveys" isOpen={isOpen} />
+            <SidebarLink to="/user/submitted-videos" icon={<FaFileAlt />} text="Submitted Videos" isOpen={isOpen} />
           </>
         )}
 

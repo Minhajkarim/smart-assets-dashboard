@@ -2,17 +2,21 @@
 import React, { useState, useEffect } from "react";
 import { FaSave, FaEdit } from "react-icons/fa";
 
+
 const Profile = ({ role }) => {
+  console.log("profile.role: ", role);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/${role}/profile`, {
+        const response = await fetch(`${backendUrl}/api/${role}/profile`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -37,7 +41,7 @@ const Profile = ({ role }) => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/${role}/profile`, {
+      const response = await fetch(`${backendUrl}/api/${role}/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

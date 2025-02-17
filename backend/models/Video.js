@@ -10,6 +10,7 @@ const videoSchema = new mongoose.Schema({
     default: "uploaded",
   },
   uploadedAt: { type: Date, default: Date.now },
+  lastModifiedAt: { type: Date, default: Date.now },
   processedAt: { type: Date },
   detectedObjects: [
     {
@@ -24,16 +25,21 @@ const videoSchema = new mongoose.Schema({
     {
       status: {
         type: String,
-        enum: ["uploaded", "processing", "processed", "processing_failed"],
+        enum: ["uploaded", "processing", "processed", "processing_failed", "Resurvey", "Approved", "Pending"],
       },
       timestamp: { type: Date, default: Date.now },
     },
   ],
   processingError: { type: String },
   uploadUserId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: String,
+    required: true,
   },
+
+  resurveryComments:{ 
+    type: Array,
+    required: true,
+    default: []},
 });
 
 videoSchema.virtual("processingDuration").get(function () {

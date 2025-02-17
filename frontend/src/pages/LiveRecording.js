@@ -19,7 +19,7 @@ import { v4 as uuidv4 } from "uuid";
 //   iconUrl: markerIcon,
 //   shadowUrl: markerShadow,
 // });
-const LiveRecording = () => {
+const LiveRecording = ({userId}) => {
   const [clientId, setClientId] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -40,8 +40,7 @@ const LiveRecording = () => {
   const canvasRef = useRef(null);
   const locationWatchId = useRef(null);
   const socket = useRef(null);
-  const backendUrl =
-    process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
   // Fetch the list of recorded videos
   useEffect(() => {
@@ -61,7 +60,7 @@ const LiveRecording = () => {
   useEffect(() => {
     // Initialize Socket.IO
     socket.current = io(
-      process.env.REACT_APP_SOCKET_URL || "http://localhost:5000"
+      process.env.REACT_APP_BACKEND_URL || "http://localhost:5000"
     );
     socket.current.on("connect", () =>
       console.log("Connected to Socket.IO server")
@@ -240,6 +239,7 @@ const LiveRecording = () => {
     socket.current.emit("stopRecording", {
       clientId: clientId,
       videoId: videoId,
+      userId: userId,
     });
     setIsRecording(false);
     setIsPaused(false);

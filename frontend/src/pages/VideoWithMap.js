@@ -8,6 +8,8 @@ const VideoWithMap = () => {
   const [videoFile, setVideoFile] = useState(null);
   const [detectedObjects, setDetectedObjects] = useState([]);
   const videoCoordinates = { lat: 25.788171416737896, lng: 55.988832614656125 };
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+
 
   const handleFileUpload = (event) => {
     setVideoFile(event.target.files[0]);
@@ -20,7 +22,7 @@ const VideoWithMap = () => {
     formData.append("file", videoFile);
 
     try {
-      const response = await axios.post("http://localhost:8000/process_video/", formData, {
+      const response = await axios.post(`${backendUrl}/process_video/`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setDetectedObjects(response.data.objects);

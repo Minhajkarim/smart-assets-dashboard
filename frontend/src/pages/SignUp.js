@@ -13,9 +13,10 @@ const SignUp = () => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
     try {
-      const response = await fetch("http://localhost:5000/api/signup", {
+      const response = await fetch(`${backendUrl}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),

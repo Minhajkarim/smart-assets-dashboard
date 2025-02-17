@@ -24,21 +24,37 @@ const server = http.createServer(app);
 // Initialize Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://psd.smartassets.ae/"], // Replace with your frontend domains
+    origin: "*", // Replace with your frontend domains
+    // origin: ["http://localhost:3000/", "https://psd.smartassets.ae/", process.env.REACT_APP_FRONTEND_URL+"/"], // Replace with your frontend domains
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   },
 });
 
+console.log({
+  origin: ["http://localhost:3000/", "https://psd.smartassets.ae/", process.env.REACT_APP_FRONTEND_URL +"/"], // Replace with your frontend domains
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+});
+
+
+
 // Middleware
 app.use(express.json()); // Parse JSON body
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://psd.smartassets.ae/"], // Replace with your frontend domains
+    // origin: ["http://localhost:3000/", "https://psd.smartassets.ae/", process.env.REACT_APP_FRONTEND_URL +"/"],
+    origin: "*",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 ); // Enable CORS
 
+
+
+
+console.log(process.env.REACT_APP_FRONTEND_URL);
 // Serve static files
 app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
 app.use(
@@ -52,6 +68,7 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/user/profile", require("./routes/profileRoutes"));
 app.use("/api/admin/profile", require("./routes/profileRoutes"));
 app.use("/api/superadmin/profile", require("./routes/profileRoutes"));
+app.use("/api/videos", require("./routes/videoRoutes.js"));
 
 // Connect to MongoDB
 mongoose
@@ -393,7 +410,7 @@ io.on("connection", (socket) => {
                 processedAt: new Date(),
                 detectedObjects: detectedObjects,
                 processedPath: publicProcessedPath,
-                uploadUserId: data.userId,
+                uploadUserId: data.userId.userId,
               });
               video.save();
             }

@@ -1,7 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // Importing useState
 import { FaUsers, FaUserShield, FaFileAlt } from 'react-icons/fa'; // Importing icons
 
+
 const StatsOverview = () => {
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    activeAdmins: 0,
+    reportsSubmitted: 0,
+  });
+
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const fetchStats = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/stat`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+
+
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch stats");
+      }
+      setStats(data);
+      console.log("Stats", data);
+    } catch (error) {
+      console.error("Fetch Stats Error", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }
+  , [stats]);
+
+
+  // Fetch data from API
+  
   return (
     <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-extrabold text-white mb-6">System Stats Overview</h2>
@@ -16,7 +52,7 @@ const StatsOverview = () => {
           </div>
           <div>
             <p className="text-sm font-semibold">Total Users</p>
-            <p className="text-xl font-bold">100</p>
+            <p className="text-xl font-bold">{stats.totalUsers}</p>
           </div>
         </div>
 
@@ -27,7 +63,7 @@ const StatsOverview = () => {
           </div>
           <div>
             <p className="text-sm font-semibold">Active Admins</p>
-            <p className="text-xl font-bold">10</p>
+            <p className="text-xl font-bold">{stats.activeAdmins}</p>
           </div>
         </div>
 
@@ -38,7 +74,7 @@ const StatsOverview = () => {
           </div>
           <div>
             <p className="text-sm font-semibold">Reports Submitted</p>
-            <p className="text-xl font-bold">50</p>
+            <p className="text-xl font-bold">{stats.reportsSubmitted}</p>
           </div>
         </div>
 

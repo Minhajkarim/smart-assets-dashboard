@@ -14,6 +14,8 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Resurveys from "./pages/Resurveys"; // Added resurveys page
 import Videos from "./pages/Videos"; // Added submitted videos page
+import ManageTeam from "./pages/ManageTeam"; // Added team management page
+import AllUsers from "./pages/AllUsers"; // Added all users page
 
 function Layout() {
   const [userRole, setUserRole] = useState(null); // Store the role from token
@@ -46,7 +48,7 @@ function Layout() {
 
   // Hide Navbar for dashboard pages
   const hideNavbar = location.pathname.startsWith("/admin") || location.pathname.startsWith("/user") || location.pathname.startsWith("/superadmin");
-
+  console.log("request.user.role", userRole);
   return (
     <>
       {/* Hide Navbar on Dashboard pages */}
@@ -70,10 +72,13 @@ function Layout() {
         <Route path="/admin/profile" element={<Profile role={userRole} />} />
         <Route path="/user/profile" element={<Profile role={userRole} />} />
         <Route path="/superadmin/profile" element={<Profile role={userRole} />} />
+        {/* <Route path="/superadmin/all-users" element={<AllUsers role="superadmin"/>} /> */}
 
         {/* User-Specific Pages */}
-        <Route path="/user/resurveys" element={<Resurveys />} />
+        <Route path="/user/resurveys" element={<Resurveys userId={userId}/>} />
         <Route path="/user/submitted-videos" element={<Videos userId={userId} />} />
+        <Route path="/admin/team-management" element={<ManageTeam role="admin"/>} />
+        <Route path="/superadmin/team-management" element={<ManageTeam role="superadmin"/>} />
       </Routes>
     </>
   );

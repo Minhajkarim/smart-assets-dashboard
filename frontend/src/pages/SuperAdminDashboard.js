@@ -5,7 +5,10 @@ import AdminManagement from "./AdminManagement"; // Admin-specific feature compo
 import SystemConfig from "./SystemConfig"; // System config component
 import DashboardNavbar from "../components/DashboardNavbar";
 
+
 const SuperAdminDashboard = () => {
+
+
   return (
     <DashboardLayout role="superadmin">
       <DashboardNavbar />

@@ -39,16 +39,23 @@ const Sidebar = ({ role, isOpen, toggleSidebar }) => {
         )}
 
         {/* Admin & Super Admin Sidebar Links */}
-        {(role === "admin" || role === "superadmin") && (
+        {(role === "admin" ) && (
           <>
-            <SidebarLink to="/team-management" icon={<FaCogs />} text="Manage Team" isOpen={isOpen} />
-            <SidebarLink to="/admin-settings" icon={<FaCogs />} text="Admin Settings" isOpen={isOpen} />
+            <SidebarLink to="/admin/team-management" icon={<FaCogs />} text="Manage Team" isOpen={isOpen} />
+            {/* <SidebarLink to="/admin/admin-settings" icon={<FaCogs />} text="Admin Settings" isOpen={isOpen} /> */}
           </>
         )}
+        {/* {( role === "superadmin") && (
+         
+        )} */}
 
         {/* Super Admin Only */}
         {role === "superadmin" && (
-          <SidebarLink to="/superadmin/all-users" icon={<FaCogs />} text="All Users" isOpen={isOpen} />
+          <>
+          {/* <SidebarLink to="/superadmin/all-users" icon={<FaCogs />} text="All Users" isOpen={isOpen} /> */}
+          <SidebarLink to="/superadmin/team-management" icon={<FaCogs />} text="Manage Team" isOpen={isOpen} />
+          {/* <SidebarLink to="/admin/admin-settings" icon={<FaCogs />} text="Admin Settings" isOpen={isOpen} /> */}
+        </>
         )}
       </nav>
     </motion.aside>

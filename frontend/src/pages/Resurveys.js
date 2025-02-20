@@ -4,15 +4,16 @@ import DashboardLayout from "./DashboardLayout";
 
 const Resurveys = (userId) => {
   const [resurveys, setResurveys] = useState([]);
-  // userId = userId.userId.userId;
+  userId = userId.userId;
     console.log("recentReports.userId: ", userId);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
     const fetchResurveys = async () => {
       try {
-        const response = await fetch(`${backendUrl}/api/videos/${userId}?limit=5`, 
+        const response = await fetch(`${backendUrl}/api/videos/${userId}?limit=5&status=Resurvey`, 
           {
+         
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -26,6 +27,7 @@ const Resurveys = (userId) => {
   
         const data = await response.json();
         setResurveys(data);
+        console.log("Resurveys: ", resurveys);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -59,28 +61,49 @@ const Resurveys = (userId) => {
 
         }
       ]
+
+      const getStatusColor = (status) => {
+  
+        switch (status) {
+          case "Pending":
+            return "text-yellow-400 bg-yellow-800";
+          case "Approved":
+            return "text-green-400 bg-green-800";
+          case "Resurvey":
+            return "text-red-400 bg-red-800";
+          case "uploaded":
+            return "text-blue-400 bg-blue-800";
+          case "Submitted":
+            return "text-blue-400 bg-blue-800";
+          default:
+            return "text-gray-400 bg-gray-700";
+        }
+      };
         
     
   return (
     <DashboardLayout role="user">
       <DashboardNavbar />
-      <div className="p-6">
-
-        <h1 className="text-2xl font-bold mb-4">Resurveys</h1>
-        {resurveys.length === 0 ? (
-          <p>No resurveys available.</p>
-        ) : (
-          <ul className="space-y-4">
-            {resurveys.map((resurvey) => (
-              <li key={resurvey._id} className="border p-4 rounded-lg shadow">
-                <h2 className="text-xl font-semibold">{resurvey.filename}</h2>
-                <p>{resurvey.resurveryComments[0]}</p>
-                <p className="text-sm text-gray-500">Date: {resurvey.lastModifiedAt}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <div className="py-6">
+      <div className="bg-gray-900 p-6 rounded-lg shadow-md">
+      <h2 className="text-lg text-white font-bold mb-4">Resurveys</h2>
+      <ul className="space-y-4">
+        {resurveys.map((video) => (
+          <li
+            key={video.id}
+            className="flex justify-between items-center bg-gray-800 p-4 rounded-md shadow"
+          >
+            <span className="text-white font-medium">{video.filename}</span>
+            <span
+              className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(video.status)}`}
+            >
+              {video.status}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    </div>
     </DashboardLayout>
   );
 };

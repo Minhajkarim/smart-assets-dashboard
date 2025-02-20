@@ -31,11 +31,11 @@ const io = new Server(server, {
   },
 });
 
-console.log({
-  origin: ["http://localhost:3000/", "https://psd.smartassets.ae/", process.env.REACT_APP_FRONTEND_URL +"/"], // Replace with your frontend domains
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-});
+// console.log({
+//   origin: ["http://localhost:3000/", "https://psd.smartassets.ae/", process.env.REACT_APP_FRONTEND_URL +"/"], // Replace with your frontend domains
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+// });
 
 
 
@@ -64,11 +64,13 @@ app.use(
 app.use("/videos", express.static(path.resolve(__dirname, "videos"))); // Expose videos folder
 
 // routes
+app.use("/api/users", require("./routes/userRoutes.js"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/user/profile", require("./routes/profileRoutes"));
 app.use("/api/admin/profile", require("./routes/profileRoutes"));
 app.use("/api/superadmin/profile", require("./routes/profileRoutes"));
 app.use("/api/videos", require("./routes/videoRoutes.js"));
+app.use("/api/stat", require("./routes/stats.js"));
 
 // Connect to MongoDB
 mongoose

@@ -6,7 +6,7 @@ const videoSchema = new mongoose.Schema({
   processedPath: { type: String, required: false },
   status: {
     type: String,
-    enum: ["uploaded", "processing", "processed", "processing_failed"],
+    enum: ["uploaded", "processing", "processed", "processing_failed", "Resurvey", "Approved", "Pending"],
     default: "uploaded",
   },
   uploadedAt: { type: Date, default: Date.now },

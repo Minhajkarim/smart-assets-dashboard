@@ -36,7 +36,7 @@ const SignIn = () => {
       setMessage({ type: "success", text: "Sign In Successful! Redirecting..." });
   
       setTimeout(() => {
-        navigate(data.role === "admin" ? "/admin" : "/user");
+        navigate(data.role === "superadmin" ? "/superadmin" : data.role === "admin" ? "/admin" : "/user");
       }, 2000);
     } catch (error) {
       setMessage({ type: "error", text: error.message });

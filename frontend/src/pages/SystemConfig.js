@@ -28,8 +28,8 @@ const SystemConfig = () => {
               <FaCog size={30} />
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-white">System Settings</h3>
-              <p className="text-sm text-white">Update core settings for the platform.</p>
+              <h3 className="text-xl font-semibold text-white">Profile Settings</h3>
+              <p className="text-sm text-white">Update the profile</p>
             </div>
           </div>
         </SwiperSlide>
@@ -41,14 +41,14 @@ const SystemConfig = () => {
               <FaUsers size={30} />
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-white">Manage Roles</h3>
-              <p className="text-sm text-white">Assign roles and permissions to users.</p>
+              <h3 className="text-xl font-semibold text-white">Manage Users</h3>
+              <p className="text-sm text-white" >View and manage users.</p>
             </div>
           </div>
         </SwiperSlide>
 
         {/* Set Limits Slide */}
-        <SwiperSlide>
+        {/* <SwiperSlide>
           <div className="bg-white bg-opacity-20 p-8 rounded-lg flex items-center shadow-lg w-full">
             <div className="p-4 bg-white rounded-full text-teal-600 mr-6">
               <FaTools size={30} />
@@ -58,7 +58,7 @@ const SystemConfig = () => {
               <p className="text-sm text-white">Define operational limits for the system.</p>
             </div>
           </div>
-        </SwiperSlide>
+        </SwiperSlide> */}
       </Swiper>
     </div>
   );

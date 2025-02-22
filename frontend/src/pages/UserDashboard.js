@@ -3,6 +3,7 @@ import DashboardLayout from "./DashboardLayout";
 import LiveRecording from "./LiveRecording";
 import RecentReports from "./RecentReports"; // Recent activities related to traffic detection
 import DashboardNavbar from "../components/DashboardNavbar";
+import LiveMap from "./LiveMap"
 
 const UserDashboard = (userId) => {
   return (
@@ -17,6 +18,12 @@ const UserDashboard = (userId) => {
       <div className="mb-6">
         <h2 className="text-2xl font-semibold mb-4">Live Recording</h2>
         <LiveRecording userId={userId}/>
+      </div>
+
+      {/* Live Map Section */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold mb-4">Live Map</h2>
+        <LiveMap userId={userId}/>
       </div>
 
       {/* Recent Reports */}

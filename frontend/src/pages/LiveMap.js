@@ -1,17 +1,44 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import mapboxgl from "mapbox-gl";
 
 const LiveMap = () => {
-  return (
-    <div className="flex justify-center items-center">
-      <iframe
-        title="Live Map"
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.8354345091847!2d144.9537363153166!3d-37.81720997975188!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0xf0727c5d3cd37894!2sFederation+Square!5e0!3m2!1sen!2sau!4v1532583959913"
-        width="100%"
-        height="400"
-        allowFullScreen
-      ></iframe>
-    </div>
-  );
+  const mapContainerRef = useRef(null);
+  const markerRef = useRef(null);
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    mapboxgl.accessToken = "pk.eyJ1IjoibWluaGFqa2FyaW0wNzgiLCJhIjoiY20zdWZjdGJ6MGo4YzJqcHhqM255eWYyciJ9.JgEUYXKrpFOrHU0WyXuzug";
+
+    // Initialize map
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: "mapbox://styles/mapbox/streets-v11",
+      center: [0, 0], // Default center, will update with live location
+      zoom: 15,
+    });
+
+    // Create marker
+    markerRef.current = new mapboxgl.Marker().setLngLat([0, 0]).addTo(mapRef.current);
+
+    // Track user location
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(
+        (position) => {
+          const { longitude, latitude } = position.coords;
+          mapRef.current.setCenter([longitude, latitude]);
+          markerRef.current.setLngLat([longitude, latitude]);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+
+    return () => mapRef.current.remove(); // Cleanup on unmount
+  }, []);
+
+  return <div ref={mapContainerRef} className="w-full h-[400px]" />;
 };
 
 export default LiveMap;

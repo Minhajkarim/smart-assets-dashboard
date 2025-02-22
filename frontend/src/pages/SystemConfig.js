@@ -2,8 +2,10 @@ import React from 'react';
 import { FaCog, FaTools, FaUsers } from 'react-icons/fa';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css'; // Import Swiper styles
+import { useNavigate } from "react-router-dom";
 
 const SystemConfig = () => {
+  const navigate = useNavigate();
   return (
     <div className="bg-gray-900 p-6 rounded-lg shadow-lg mt-10">
       <h2 className="text-2xl font-bold text-white mb-6">System Configuration</h2>
@@ -21,31 +23,37 @@ const SystemConfig = () => {
           1024: { slidesPerView: 1.2 }, // Same for large screens
         }}
       >
-        {/* System Settings Slide */}
-        <SwiperSlide>
-          <div className="bg-white bg-opacity-20 p-8 rounded-lg flex items-center shadow-lg w-full">
-            <div className="p-4 bg-white rounded-full text-teal-500 mr-6">
-              <FaCog size={30} />
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-white">Profile Settings</h3>
-              <p className="text-sm text-white">Update the profile</p>
-            </div>
+        {/* Profile Settings Slide */}
+      <SwiperSlide>
+        <div
+          className="bg-white bg-opacity-20 p-8 rounded-lg flex items-center shadow-lg w-full cursor-pointer"
+          onClick={() => navigate("/superadmin/profile")} // Redirect to profile settings
+        >
+          <div className="p-4 bg-white rounded-full text-teal-500 mr-6">
+            <FaCog size={30} />
           </div>
-        </SwiperSlide>
+          <div>
+            <h3 className="text-xl font-semibold text-white">Profile Settings</h3>
+            <p className="text-sm text-white">Update the profile</p>
+          </div>
+        </div>
+      </SwiperSlide>
 
-        {/* Manage Roles Slide */}
-        <SwiperSlide>
-          <div className="bg-white bg-opacity-20 p-8 rounded-lg flex items-center shadow-lg w-full">
-            <div className="p-4 bg-white rounded-full text-green-500 mr-6">
-              <FaUsers size={30} />
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-white">Manage Users</h3>
-              <p className="text-sm text-white" >View and manage users.</p>
-            </div>
+      {/* Manage Admins Slide */}
+      <SwiperSlide>
+        <div
+          className="bg-white bg-opacity-20 p-8 rounded-lg flex items-center shadow-lg w-full cursor-pointer"
+          onClick={() => navigate("/superadmin/team-management")} // Redirect to manage admins
+        >
+          <div className="p-4 bg-white rounded-full text-green-500 mr-6">
+            <FaUsers size={30} />
           </div>
-        </SwiperSlide>
+          <div>
+            <h3 className="text-xl font-semibold text-white">Manage Admins</h3>
+            <p className="text-sm text-white">View and manage admins.</p>
+          </div>
+        </div>
+      </SwiperSlide>
 
         {/* Set Limits Slide */}
         {/* <SwiperSlide>

@@ -16,6 +16,11 @@ import Resurveys from "./pages/Resurveys"; // Added resurveys page
 import Videos from "./pages/Videos"; // Added submitted videos page
 import ManageTeam from "./pages/ManageTeam"; // Added team management page
 import AllUsers from "./pages/AllUsers"; // Added all users page
+import Reports from "./pages/Reports";
+import LiveMap from "./pages/LiveMap";
+import CollectedImages from "./pages/CollectedImages";
+import OutputVideos from "./pages/OutputVideos";
+import ChartsGraphs from "./pages/Charts";
 
 function Layout() {
   const [userRole, setUserRole] = useState(null); // Store the role from token
@@ -79,6 +84,11 @@ function Layout() {
         <Route path="/user/submitted-videos" element={<Videos userId={userId} />} />
         <Route path="/admin/team-management" element={<ManageTeam role="admin"/>} />
         <Route path="/superadmin/team-management" element={<ManageTeam role="superadmin"/>} />
+        <Route path="/user/report" element={<Reports userId={userId} />} />
+        <Route path="/map" element={<LiveMap userId={userId} />} />
+        <Route path="/images" element={<CollectedImages userId={userId} />} />
+        <Route path="/output-video" element={<OutputVideos userId={userId} />} />
+        <Route path="/user/charts" element={<ChartsGraphs userId={userId} />} />
       </Routes>
     </>
   );

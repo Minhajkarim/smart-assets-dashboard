@@ -69,6 +69,8 @@ router.post("/signin", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ message: "Invalid email or password" });
+    
+    if(user.approved===false) return res.status(401).json({ message: "User is not active" });
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
@@ -86,7 +88,6 @@ router.post("/signin", async (req, res) => {
       role: user.role,
     };
 
-    console.log("resData: ", resData);
     res.json(resData);
   } catch (error) {
     res.status(500).json({ message: "Server Error" });

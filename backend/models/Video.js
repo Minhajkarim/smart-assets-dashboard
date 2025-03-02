@@ -14,13 +14,20 @@ const videoSchema = new mongoose.Schema({
   processedAt: { type: Date },
   detectedObjects: [
     {
+      id: { type: String },
       label: { type: String, required: true },
       x: { type: Number, required: true },
       y: { type: Number, required: true },
       width: { type: Number, required: true },
       height: { type: Number, required: true },
+      image_path: { type: String, default: "" },
     },
   ],
+  total_kms: {
+    type: Number,
+    required: false,
+    default: 0.0,
+  },
   statusHistory: [
     {
       status: {

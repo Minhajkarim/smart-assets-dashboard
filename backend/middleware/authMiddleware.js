@@ -13,6 +13,8 @@ const authMiddleware = async (req, res, next) => {
     const decoded = jwt.verify(token.replace("Bearer ", ""), JWT_SECRET);
     const user = await User.findById(decoded.userId).select("-password"); // Fetch user from DB
     if (!user) return res.status(404).json({ error: "User not found" });
+    
+    if(user.approved===false) return res.status(401).json({ error: "User is not active" });
 
     req.user = user; // Attach full user object to `req.user`
     next();

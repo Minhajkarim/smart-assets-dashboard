@@ -13,6 +13,9 @@ const { PythonShell } = require("python-shell");
 const { hostname } = require("os");
 const Video = require("./models/Video");
 const User = require("./models/User");
+const ObjectMetadata = require("./models/ObjectMetadata");
+const { count } = require("console");
+
 
 let clients = {};
 
@@ -25,7 +28,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "*", // Replace with your frontend domains
-    // origin: ["http://localhost:3000/", "https://psd.smartassets.ae/", process.env.REACT_APP_FRONTEND_URL+"/"], // Replace with your frontend domains
+    // origin: ["http://localhost:3000/", "https://psd.smartassets.ae/"], // Replace with your frontend domains
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   },
@@ -43,7 +46,7 @@ const io = new Server(server, {
 app.use(express.json()); // Parse JSON body
 app.use(
   cors({
-    // origin: ["http://localhost:3000/", "https://psd.smartassets.ae/", process.env.REACT_APP_FRONTEND_URL +"/"],
+    // origin: ["http://localhost:3000/", "https://psd.smartassets.ae/"],
     origin: "*",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -54,7 +57,6 @@ app.use(
 
 
 
-console.log(process.env.REACT_APP_FRONTEND_URL);
 // Serve static files
 app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
 app.use(
@@ -71,6 +73,7 @@ app.use("/api/admin/profile", require("./routes/profileRoutes"));
 app.use("/api/superadmin/profile", require("./routes/profileRoutes"));
 app.use("/api/videos", require("./routes/videoRoutes.js"));
 app.use("/api/stat", require("./routes/stats.js"));
+app.use("/api/objectmetadata", require("./routes/objectMetadata.js"));
 
 // Connect to MongoDB
 mongoose
@@ -281,7 +284,6 @@ io.on("connection", (socket) => {
   socket.on("stopRecording", (data) => {
     // get the client id and video id from the data
 
-    console.log("server.stopRecording.data", data);
 
     if (data.videoId && data.clientId) {
       // check if client exists in clients object
@@ -369,6 +371,7 @@ io.on("connection", (socket) => {
             args: [videoPath, metadataPath],
           };
           let detectedObjects = [];
+          let kms = 0.0;
           const pyshell = new PythonShell("processRecording.py", options);
 
           // call the python script to process the video
@@ -382,6 +385,9 @@ io.on("connection", (socket) => {
               }
               if (update.detectedObjects) {
                 detectedObjects = update.detectedObjects; // Collect detected objects
+              }
+              if (update.total_distance_km) {
+                kms = update.kms;
               }
             } catch (err) {
               console.error("Failed to parse progress update:", err);
@@ -403,6 +409,34 @@ io.on("connection", (socket) => {
               console.log("Python Script ended");
 
               console.log("Saving video data to the database");
+
+
+              // preprocess the detected objects to add a unique id
+              for (let object of detectedObjects) {
+                let metadata;
+                let count
+                const urlSafeLabel = object.label
+                                    .toLowerCase() // Convert to lowercase
+                                    .replace(/\s+/g, "_") // Replace spaces with underscores
+                                    .replace(/[^a-z0-9_-]/g, ""); // Remove special characters except _ and -
+                try{
+                metadata = await ObjectMetadata.findOneAndUpdate(
+                                { label: urlSafeLabel },
+                                { name: object.label ,$inc: { count: 1 } },
+                                { upsert: true, new: true }
+                              );
+
+                if (!metadata) {
+                  throw new Error("Failed to get metadata");
+                }
+                count = metadata.count || 1;
+              }catch(err){
+                console.log(err);
+              }
+              object.id = `${urlSafeLabel}-${String(count).padStart(9, "0")}`;
+               
+              }
+
               // save the video data to the database
 
               const video = new Video({
@@ -413,6 +447,7 @@ io.on("connection", (socket) => {
                 detectedObjects: detectedObjects,
                 processedPath: publicProcessedPath,
                 uploadUserId: data.userId.userId,
+                total_kms: kms,
               });
               video.save();
             }

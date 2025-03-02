@@ -4,6 +4,7 @@ from scipy.spatial.distance import pdist, squareform
 import numpy as np
 import pandas as pd
 import json
+import os
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -91,3 +92,28 @@ def deduplicate_objects(objects):
     print(json.dumps(
         {"Process": f"Deduplication: {len(objects)} -> {len(deduplicated)}"}))
     return deduplicated
+
+
+
+def total_distance_km(locations):
+    total_km = 0.0
+    for i in range(1, len(locations)):
+        lat1 = locations[i-1]['latitude']
+        lon1 = locations[i-1]['longitude']
+        lat2 = locations[i]['latitude']
+        lon2 = locations[i]['longitude']
+        total_km += haversine(lat1, lon1, lat2, lon2)
+    return total_km / 1000.0
+
+def cleanup_images(objects, img_dir_path):
+    img_paths = []
+    
+    for obj in objects:
+        img_paths.append(f"img_dir_path/{obj['image_path']}")
+
+    # delete all imgages in img_dir_path that are not in img_paths
+    import os
+    for filename in os.listdir(img_dir_path):
+        if filename not in img_paths:
+            # os.remove(os.path.join(img_dir_path, filename))
+            pass

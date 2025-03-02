@@ -16,9 +16,18 @@ router.get("/", authMiddleware, async (req, res) => {
           const totalPages = Math.ceil(totalUsers / limit);
       
           // Fetch users with pagination, excluding passwords
+          console.log(req.user.role);
+          let users;
+          if (req.user.role === "admin"){
+            users = await User.find({role:"user"}, "-password").skip(skip).limit(limit);
+
+          }else if (req.user.role === "superadmin"){
+            // find users and admins but not superadmins
+            users = await User.find({role:{$ne:"superadmin"}}, "-password").skip(skip).limit(limit);
+          }
+          console.log(users);
     
-          const users = await User.find({role:"user"}, "-password").skip(skip).limit(limit);
-    
+          
     
           if (!users) return res.status(204).json({ error: "No Users" });
       
@@ -38,12 +47,12 @@ router.get("/", authMiddleware, async (req, res) => {
 // ✅ Update Single User (PUT /users/:user_id)
 router.put("/:user_id",authMiddleware, async (req, res) => {
   const { user_id } = req.params;
-  const { name, email, role } = req.body; // Allow updating only specific fields
+  const { name, email, role,approved } = req.body; // Allow updating only specific fields
 
   try {
     const updatedUser = await User.findByIdAndUpdate(
       user_id,
-      { name, email, role }, // Only update these fields
+      { name, email, role, approved }, // Only update these fields
       { new: true, runValidators: true }
     );
 

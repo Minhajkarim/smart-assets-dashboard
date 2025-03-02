@@ -9,7 +9,7 @@ import re
 import pandas as pd
 
 from YOLO_Pred import YOLO_Pred
-from postProcess import deduplicate_objects
+from postProcess import deduplicate_objects, total_distance_km, cleanup_images
 
 
 def get_format_by_extension(file_path):
@@ -277,6 +277,10 @@ if ext == 'webm':
 output_dir = 'videos'
 os.makedirs(output_dir, exist_ok=True)
 
+output_imges_dir = 'videos/images'
+os.makedirs(output_imges_dir, exist_ok=True)
+
+
 # Initialize YOLO model as a singleton
 model_path = 'models/best.onnx'
 data_yaml = 'models/data.yaml'
@@ -322,6 +326,11 @@ output_video_path = os.path.join(output_dir, os.path.basename(
 out = cv2.VideoWriter(output_video_path, fourcc, fps,
                       (frame_width, frame_height))
 
+output_imges_dir = os.path.join(
+    output_imges_dir, os.path.basename(input_source).replace(file_extension, ''))
+
+os.makedirs(output_imges_dir, exist_ok=True)
+
 frame_num = 0
 frame_idx1 = frames[0]["frameId"]
 frame_idx_last = frames[-1]["frameId"]
@@ -329,6 +338,8 @@ frame_idx_last = frames[-1]["frameId"]
 print(json.dumps({"last_frame": frame_idx_last}))
 last_reported_progress = 0
 detected_objects = []
+images = []
+prev_frame = None
 
 try:
     while True:
@@ -342,13 +353,30 @@ try:
         # processed_frame, objects = yolo_model.predictions_with_objects(frame)
         processed_frame, objects = yolo_model.predictions_with_tracking(frame)
         # check if the objects are not empty
+        
+        
+        
         if objects:
+            
             for obj in objects:
+
                 # check the metadata for frame idx
 
                 if frame_idx1 in processed_metadata:
                     x = processed_metadata[frame_idx1]["location"]["latitude"]
                     y = processed_metadata[frame_idx1]["location"]["longitude"]
+
+                img_name = f'{obj["label"]}_{str(x)}_{str(y)}.jpg'
+                img_path = os.path.join(
+                        output_imges_dir,img_name)
+                if img_path not in images:
+                    images.append(img_path)
+                else:
+                    # save the image
+                    if prev_frame is not None:
+                        cv2.imwrite(img_path, prev_frame)
+                    else:
+                        cv2.imwrite(img_path, frame)
 
                 detected_objects.append({
                     "track_id": obj['track_id'],
@@ -356,8 +384,10 @@ try:
                     "width": obj['width'],
                     "height": obj['height'],
                     "x": x,
-                    "y": y
+                    "y": y,
+                    "image_path": img_path
                 })
+                
 
         if processed_frame is None:
             error_message = {
@@ -393,6 +423,8 @@ try:
                 print(json.dumps(progress_update))
                 last_reported_progress = progress
 
+        prev_frame = processed_frame.copy()
+
 except Exception as e:
     error_message = {
         'progress': 100,
@@ -407,9 +439,13 @@ d_detected_objects = []
 if detected_objects:
     d_detected_objects = deduplicate_objects(detected_objects)
 
+# cleanup_images(d_detected_objects, output_imges_dir)
+
+kms = total_distance_km(locations)
 output_video_info = {
     'output_video': output_video_path,
     'detected_objects': d_detected_objects,
+    "total_distance_km": kms,
     "progress": 100,
     "message": "Processing completed successfully."
 }

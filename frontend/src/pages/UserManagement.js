@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaUserAlt, FaTrashAlt, FaEdit, FaRegArrowAltCircleLeft, FaRegArrowAltCircleRight } from 'react-icons/fa'; // Adding edit icon
-
-const UserManagement = () => {
+import {FiUserCheck, FiUserX  } from 'react-icons/fi';
+import {AiOutlineUser, AiOutlineCrown } from 'react-icons/ai';
+const UserManagement = ({role}) => {
   const [users, setUsers] = useState([]);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(null);
@@ -63,8 +64,8 @@ const UserManagement = () => {
 
   
   // Function to assign colors based on roles
-  const getRoleBadgeColor = (role) => {
-    switch (role) {
+  const getRoleBadgeColor = (user) => {
+    switch (user.role) {
       // case 'traffic light':
       //   return 'bg-green-500'; // Green for traffic light
       // case 'sign boards':
@@ -74,9 +75,17 @@ const UserManagement = () => {
       // default:
       //   return 'bg-gray-400'; // Default color
       case 'user':
-        return 'bg-green-500'; // Green for traffic light
+        if (user.approved){
+          return 'bg-green-500'; // Green for traffic light
+        }else{
+          return 'bg-red-500'; // Red for road cracks
+        }
       case 'admin':
-        return 'bg-yellow-500'; // Yellow for sign boards
+        if (user.approved){
+          return 'bg-yellow-500'; // Yellow for sign boards
+        }else{
+          return 'bg-red-500'; // Red for road cracks
+        }
       case 'superadmin':
         return 'bg-red-500'; // Red for road cracks
       default:
@@ -96,7 +105,6 @@ const UserManagement = () => {
   };
 
   const handleDelete = async (user) => {
-    console.log("DELETE CALLED:", user);
     try {
       const response = await fetch(`${backendUrl}/api/users/${user._id}`, {
         method: "DELETE",
@@ -116,6 +124,66 @@ const UserManagement = () => {
       setError(err.message);
     }
   };
+
+  const handleActivate = async (user) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/users/${user._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ approved: !user.approved }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update user");
+      }
+
+      // Update the user in the list
+      setUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u._id === user._id ? { ...u, approved: !u.approved } : u
+        )
+      );
+
+
+      fetchUsers();
+    
+    } catch (err) {
+      setError(err.message);
+    }
+
+  }
+
+  const handleAdmin = async (user) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/users/${user._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ role: user.role=="user" ? "admin" : "user" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update user");
+      }
+
+      // Update the user in the list
+      setUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u._id === user._id ? { ...u, role: user.role=="user" ? "admin" : "user" } : u
+        )
+      );
+
+      fetchUsers();
+    
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   
 
@@ -139,7 +207,7 @@ const UserManagement = () => {
                 <span className="text-lg font-medium text-gray-800">{user.name}</span>
                 <p className="text-xs font-medium text-gray-800">{user.email}</p>
                 <div className="flex items-center mt-1">
-                  <span className={`w-3 h-3 rounded-full ${getRoleBadgeColor(user.role)} mr-2`}></span>
+                  <span className={`w-3 h-3 rounded-full ${getRoleBadgeColor(user)} mr-2`}></span>
                   <span className="text-sm text-gray-600 capitalize">{user.role}</span>
                 </div>
               </div>
@@ -147,12 +215,30 @@ const UserManagement = () => {
 
             {/* Action buttons */}
             <div className="flex space-x-2">
-              {/* <button className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300 ease-in-out"
-              onClick={() =>handleEdit(user)}
+            {role=="superadmin" && (
+            <button className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all duration-300 ease-in-out"
+              onClick={() =>handleAdmin(user)}
               >
-                <FaEdit className="mr-2" />
-                Edit
-              </button> */}
+              {user.role=="user" ? (
+                 <AiOutlineCrown  className="mr-2" />
+              ) : ( <AiOutlineUser  className="mr-2"/> )}
+              {user.role=="user" ? (
+                "Make Admin"
+              ) : ( "Make User")}
+
+              </button>
+            )}
+              <button className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all duration-300 ease-in-out"
+              onClick={() =>handleActivate(user)}
+              >
+              {!user.approved ? (
+                 <FiUserCheck className="mr-2" />
+              ) : ( <FiUserX  className="mr-2"/> )}
+              {!user.approved ? (
+                "Activate"
+              ) : ( "Deactivate")}
+
+              </button>
               <button 
               className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all duration-300 ease-in-out"
               onClick={async ()=>{await handleDelete(user)}}>

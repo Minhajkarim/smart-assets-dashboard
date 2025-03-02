@@ -26,7 +26,6 @@ const Videos = (userId) => {
 
       const data = await response.json();
       setVideos(data);
-      console.log("Videos.videos: ", data);
     } catch (err) {
       setError(err.message);
     } finally {

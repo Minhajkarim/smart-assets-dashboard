@@ -22,7 +22,7 @@ const ManageTeam = ({role}) => {
           <h2 className="text-3xl font-semibold text-white mb-4">
             Team Management
           </h2>
-          <UserManagement />
+          <UserManagement role={role}/>
         </div>
       </div>
     </DashboardLayout>);

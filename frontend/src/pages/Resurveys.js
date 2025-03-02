@@ -5,7 +5,6 @@ import DashboardLayout from "./DashboardLayout";
 const Resurveys = (userId) => {
   const [resurveys, setResurveys] = useState([]);
   userId = userId.userId;
-    console.log("recentReports.userId: ", userId);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
@@ -27,7 +26,6 @@ const Resurveys = (userId) => {
   
         const data = await response.json();
         setResurveys(data);
-        console.log("Resurveys: ", resurveys);
       } catch (err) {
         setError(err.message);
       } finally {

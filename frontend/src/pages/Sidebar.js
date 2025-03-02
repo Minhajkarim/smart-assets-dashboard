@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaTachometerAlt, FaUser, FaFileAlt, FaCogs, FaBars, FaTimes, FaHome } from "react-icons/fa";
+import { FaTachometerAlt, FaUser, FaFileAlt, FaCogs, FaBars, FaTimes, FaHome, FaVideo, FaMap } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 const Sidebar = ({ role, isOpen, toggleSidebar }) => {
@@ -41,6 +41,8 @@ const Sidebar = ({ role, isOpen, toggleSidebar }) => {
         {/* Admin & Super Admin Sidebar Links */}
         {(role === "admin" ) && (
           <>
+            <SidebarLink to="/admin/WatchVideo" icon={<FaVideo />} text="Videos" isOpen={isOpen} />
+            <SidebarLink to="/admin/map" icon={<FaMap />} text="Map" isOpen={isOpen} />
             <SidebarLink to="/admin/team-management" icon={<FaCogs />} text="Manage Team" isOpen={isOpen} />
             {/* <SidebarLink to="/admin/admin-settings" icon={<FaCogs />} text="Admin Settings" isOpen={isOpen} /> */}
           </>
@@ -53,7 +55,10 @@ const Sidebar = ({ role, isOpen, toggleSidebar }) => {
         {role === "superadmin" && (
           <>
           {/* <SidebarLink to="/superadmin/all-users" icon={<FaCogs />} text="All Users" isOpen={isOpen} /> */}
+          <SidebarLink to="/superadmin/WatchVideo" icon={<FaVideo />} text="Videos" isOpen={isOpen} />
+          <SidebarLink to="/superadmin/map" icon={<FaMap />} text="Map" isOpen={isOpen} />
           <SidebarLink to="/superadmin/team-management" icon={<FaCogs />} text="Manage Team" isOpen={isOpen} />
+
           {/* <SidebarLink to="/admin/admin-settings" icon={<FaCogs />} text="Admin Settings" isOpen={isOpen} /> */}
         </>
         )}

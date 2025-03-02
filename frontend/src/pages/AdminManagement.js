@@ -25,7 +25,6 @@ const AdminManagement = () => {
       const data = await response.json();
       setAdmins(data);
       setLoading(false);
-      console.log("Admins:", data);
     } catch (error) {
       console.error("Error fetching admins:", error);
     }
@@ -71,7 +70,7 @@ const AdminManagement = () => {
       >
         {/* Admin 1 */}
         {admins.length=== 0  ? <div>"No Admins"</div>: admins.map((admin) => (
-           <SwiperSlide>
+           <SwiperSlide key={admin._id}>
            <div className="flex items-center justify-between bg-white bg-opacity-20 p-4 rounded-lg shadow-md">
              <div className="flex items-center">
                <FaUserAlt className="text-white mr-3" />

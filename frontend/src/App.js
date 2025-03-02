@@ -16,6 +16,8 @@ import Resurveys from "./pages/Resurveys"; // Added resurveys page
 import Videos from "./pages/Videos"; // Added submitted videos page
 import ManageTeam from "./pages/ManageTeam"; // Added team management page
 import AllUsers from "./pages/AllUsers"; // Added all users page
+import WatchVideo from "./pages/WatchVideo"; // Added watch video page
+import MapObjects from "./pages/Map";
 
 function Layout() {
   const [userRole, setUserRole] = useState(null); // Store the role from token
@@ -30,11 +32,8 @@ function Layout() {
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        console.log("Decoded Token", decodedToken);
         setUserId(decodedToken.userId);
         setUserRole(decodedToken.role);
-        console.log("app.user.role", userRole);
-        console.log("app.UserId", userId);
       } catch (error) {
         console.error("Failed to decode token", error);
         setUserRole(null);
@@ -48,7 +47,6 @@ function Layout() {
 
   // Hide Navbar for dashboard pages
   const hideNavbar = location.pathname.startsWith("/admin") || location.pathname.startsWith("/user") || location.pathname.startsWith("/superadmin");
-  console.log("request.user.role", userRole);
   return (
     <>
       {/* Hide Navbar on Dashboard pages */}
@@ -72,6 +70,8 @@ function Layout() {
         <Route path="/admin/profile" element={<Profile role={userRole} />} />
         <Route path="/user/profile" element={<Profile role={userRole} />} />
         <Route path="/superadmin/profile" element={<Profile role={userRole} />} />
+        <Route path="/superadmin/WatchVideo" element={<WatchVideo userId={userId} role={userRole}/>} />
+        <Route path="/superadmin/Map" element={<MapObjects userId={userId} role={userRole}/>} />
         {/* <Route path="/superadmin/all-users" element={<AllUsers role="superadmin"/>} /> */}
 
         {/* User-Specific Pages */}
@@ -79,6 +79,9 @@ function Layout() {
         <Route path="/user/submitted-videos" element={<Videos userId={userId} />} />
         <Route path="/admin/team-management" element={<ManageTeam role="admin"/>} />
         <Route path="/superadmin/team-management" element={<ManageTeam role="superadmin"/>} />
+        <Route path="/admin/WatchVideo" element={<WatchVideo userId={userId} role={userRole}/>} />
+        <Route path="/admin/Map" element={<MapObjects userId={userId} role={userRole}/>} />
+
       </Routes>
     </>
   );

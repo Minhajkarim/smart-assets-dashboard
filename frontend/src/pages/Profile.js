@@ -4,7 +4,6 @@ import { FaSave, FaEdit } from "react-icons/fa";
 
 
 const Profile = ({ role }) => {
-  console.log("profile.role: ", role);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

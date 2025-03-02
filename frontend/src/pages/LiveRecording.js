@@ -67,8 +67,6 @@ const LiveRecording = ({userId}) => {
     );
 
     socket.current.on("videoSaved", (data) => {
-      console.log("Video saved successfully");
-      console.log("Video ID:", data.videoId);
       alert("Video saved successfully");
     });
 
@@ -82,7 +80,6 @@ const LiveRecording = ({userId}) => {
     });
 
     socket.current.on("processingProgress", (data) => {
-      console.log("Processing progress:", data);
       setProcessingProgress(data.progress);
       setFrameCount(`${data.message}`);
     });
@@ -265,7 +262,6 @@ const LiveRecording = ({userId}) => {
           formData
         );
         alert("Report generated successfully!");
-        console.log("Report response:", response.data);
       } catch (error) {
         console.error("Error generating report:", error);
       }

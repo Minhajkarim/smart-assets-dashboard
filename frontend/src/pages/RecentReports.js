@@ -31,7 +31,6 @@ const getStatusColor = (status) => {
 const RecentReports = (userId) => {
 
   userId = userId.userId.userId;
-  console.log("recentReports.userId: ", userId);
   const [videoReports, setVideoReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

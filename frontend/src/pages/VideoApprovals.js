@@ -15,7 +15,7 @@ const VideoApprovals = () => {
 
       const fetchVideos = async () => {
         try {
-          const response = await fetch(`${backendUrl}/api/videos?limit=${limit}&page=${page}&status=Pending`,
+          const response = await fetch(`${backendUrl}/api/videos?limit=${limit}&page=${page}&status=uploaded`,
             {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -50,13 +50,11 @@ const VideoApprovals = () => {
       };
 
       const handleWatch = (url) => {
-        console.log("Watch", url);
         window.open(url, "_blank");
       };
 
       const handleApprove = async (video) => {
         const id = video._id;
-        console.log("Approve", id);
         try {
           const response = await fetch(`${backendUrl}/api/videos/update/${id}`, {
             method: "PUT", 
@@ -74,7 +72,6 @@ const VideoApprovals = () => {
           setVideos((prevVideos) => prevVideos.filter((vid) => vid._id !== id));
           fetchVideos();
 
-          console.log("video", video);
         } catch (err) {
           setError(err.message);
         } 
@@ -83,7 +80,6 @@ const VideoApprovals = () => {
 
       const handleReject = async (video) => {
         const id = video._id;
-        console.log("Approve", id);
         try {
           const response = await fetch(`${backendUrl}/api/videos/update/${id}`, {
             method: "PUT", 
@@ -101,7 +97,6 @@ const VideoApprovals = () => {
           setVideos((prevVideos) => prevVideos.filter((vid) => vid._id !== id));
           fetchVideos();
 
-          console.log("video", video);
         } catch (err) {
           setError(err.message);
         } 
